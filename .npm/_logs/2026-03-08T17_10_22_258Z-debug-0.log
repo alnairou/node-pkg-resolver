@@ -1,0 +1,24 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@11.7.0
+2 info using node@v24.13.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/usr/local/www/sites/alnair.eu/.npmrc
+5 silly config load:file:/usr/local/etc/npmrc
+6 warn Unknown global config "python". This will stop working in the next major version of npm.
+7 verbose title npm run build
+8 verbose argv "run" "build"
+9 verbose logfile logs-max:10 dir:/usr/local/www/sites/alnair.eu/.npm/_logs/2026-03-08T17_10_22_258Z-
+10 verbose logfile /usr/local/www/sites/alnair.eu/.npm/_logs/2026-03-08T17_10_22_258Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET 200 https://registry.npmjs.org/npm 10400ms
+13 verbose cwd /usr/local/www/sites/alnair.eu
+14 verbose os FreeBSD 14.3-RELEASE-p8
+15 verbose node v24.13.0
+16 verbose npm  v11.7.0
+17 notice
+17 notice New [33mminor[39m version of npm available! [33m11.7.0[39m -> [34m11.11.0[39m
+17 notice Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.11.0[39m
+17 notice To update run: [4mnpm install -g npm@11.11.0[24m
+17 notice  { force: true, Symbol(proc-log.meta): true }
+18 verbose exit 1
+19 verbose code 1

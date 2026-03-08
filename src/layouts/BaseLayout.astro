@@ -4,7 +4,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CookieBanner from '../components/CookieBanner.astro';
-import LanguageDetector from '../components/LanguageDetector.astro'; // System sugestii języka
+import LanguageDetector from '../components/LanguageDetector.astro'; 
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -14,22 +14,21 @@ interface Props {
   lang?: string;
 }
 
-// Pobieranie języka: Priorytet prop -> Astro.currentLocale -> Domyślny 'pl'
-const { 
-  title, 
-  description = "ALNAIR OU - Global Strategic Intelligence & Lobbying (Defence / Intelligence)", 
+const {
+  title,
+  description = "ALNAIR OU - Global Strategic Intelligence & Lobbying (Defence / Intelligence)",
   heroImage,
-  lang = Astro.currentLocale || "pl" 
+  lang = Astro.currentLocale || "pl"
 } = Astro.props;
 
 const locales = ['pl', 'en', 'et', 'de', 'he', 'ru', 'ua', 'ko', 'ja', 'zh-tw'];
 const isRTL = lang === 'he';
 
-// Funkcja SEO Hreflang - informuje Google o powiązanych wersjach językowych
+// Poprawiona funkcja Hreflang dla lepszego pozycjonowania
 const getHreflangUrl = (locale: string) => {
   const path = Astro.url.pathname.replace(/^\/(en|et|de|he|ru|ua|ko|ja|zh-tw)\//, '/');
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  const localizedPath = locale === 'pl' ? cleanPath : `/${locale}${cleanPath}`;
+  const localizedPath = locale === 'pl' ? cleanPath : `/${locale}${cleanPath.replace(/\/$/, '')}`;
   return new URL(localizedPath, Astro.site || 'https://www.alnair.eu');
 };
 ---
@@ -40,7 +39,6 @@ const getHreflangUrl = (locale: string) => {
     <BaseHead title={title} description={description} image={heroImage} />
     <ClientRouter />
 
-    <!-- SEO: Automatyczne linki hreflang dla wszystkich 10 rynków -->
     {locales.map((loc) => (
       <link rel="alternate" hreflang={loc} href={getHreflangUrl(loc)} />
     ))}
@@ -51,29 +49,26 @@ const getHreflangUrl = (locale: string) => {
         --accent: #2563eb;
         --brand-dark: #020617;
       }
-      
-      /* Optymalizacja dla niedowidzących i czytelność */
+
       body {
         font-family: system-ui, -apple-system, sans-serif;
         font-size: 1.125rem;
         line-height: 1.75;
         text-rendering: optimizeLegibility;
+        margin: 0;
       }
 
-      /* Wyraźny focus dla nawigacji klawiaturą (WCAG) */
       *:focus-visible {
         outline: 4px solid var(--accent);
         outline-offset: 4px;
         border-radius: 2px;
       }
 
-      /* Płynne ładowanie obrazów */
       img {
         max-width: 100%;
         height: auto;
       }
 
-      /* Specyficzne czcionki dla Azji (jeśli dostępne w systemie) */
       :lang(ko) { font-family: "Malgun Gothic", dotum, sans-serif; }
       :lang(ja) { font-family: "Meiryo", "MS P Gothic", sans-serif; }
       :lang(zh-tw) { font-family: "Microsoft JhengHei", sans-serif; }
@@ -81,11 +76,8 @@ const getHreflangUrl = (locale: string) => {
   </head>
 
   <body class="bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-300">
-    
-    <!-- Autonomiczny robot wykrywający język przeglądarki -->
-    <LanguageDetector />
 
-    <!-- Nagłówek korporacyjny ALNAIR OU -->
+    <LanguageDetector />
     <Header />
 
     <main id="main-content" class="flex-grow w-full max-w-7xl mx-auto px-6 py-12">
@@ -94,15 +86,13 @@ const getHreflangUrl = (locale: string) => {
           <img src={heroImage} alt={title} class="w-full object-cover max-h-[500px]" />
         </div>
       )}
-      
+
       <div class="max-w-4xl mx-auto">
-        <slot /> <!-- Tu trafia treść z Twoich stron .astro -->
+        <slot /> 
       </div>
     </main>
 
     <Footer />
-
-    <!-- Wielojęzyczny banner cookies -->
     <CookieBanner lang={lang} />
 
   </body>

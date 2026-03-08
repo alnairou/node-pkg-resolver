@@ -1,0 +1,46 @@
+name: ALNAIR OU Global Autonomous Monitor
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # Automatyczny test codziennie o 9:00 rano
+  push:
+    branches: [ main, master ] # Test po każdym wdrożeniu zmian
+  workflow_dispatch: # Przycisk "Run" w panelu GitHub Actions
+
+jobs:
+  sitemap-health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract and Verify URLs from Sitemap
+        run: |
+          SITEMAP_URL="https://www.alnair.eu"
+          echo "🤖 Robot ALNAIR OU uruchamia skanowanie sitemapa..."
+          
+          # Pobranie sitemapa i wyciągnięcie wszystkich tagów <loc> (adresów URL)
+          URLS=$(curl -s $SITEMAP_URL | grep -oP '(?<=<loc>).*?(?=</loc>)')
+          
+          if [ -z "$URLS" ]; then
+            echo "❌ BŁĄD: Nie znaleziono linków w sitemapie lub plik nie istnieje pod $SITEMAP_URL"
+            exit 1
+          fi
+
+          FAILED=0
+          for url in $URLS; do
+            echo -n "Checking $url... "
+            # Sprawdzenie statusu HTTP (max 10 sekund na odpowiedź)
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" --max-time 10 "$url")
+            
+            if [ "$STATUS" -eq 200 ]; then
+              echo "✅ [200 OK]"
+            else
+              echo "❌ [ERROR: $STATUS]"
+              FAILED=$((FAILED + 1))
+            fi
+          done
+
+          if [ $FAILED -gt 0 ]; then
+            echo "⚠️ Robot wykrył $FAILED błędnych adresów na platformie ALNAIR OU!"
+            exit 1
+          else
+            echo "🚀 Wszystkie rynki (10 języków) są online i działają poprawnie."
+          fi

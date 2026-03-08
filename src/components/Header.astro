@@ -1,0 +1,204 @@
+---
+// src/components/Header.astro
+import HeaderLink from './HeaderLink.astro';
+
+// Pełna lista języków z Twojego astro.config.mjs
+const locales = ['pl', 'en', 'et', 'de', 'he', 'ru', 'ua', 'ko', 'ja', 'zh-tw'];
+const currentLang = Astro.currentLocale || 'pl';
+
+// Inteligentna funkcja budowania ścieżek (SEO & UX)
+const getLocalizedPath = (locale: string) => {
+  // Usuwa obecny prefiks języka z URL, aby dostać "czystą" ścieżkę
+  const cleanPath = Astro.url.pathname.replace(/^\/(en|et|de|he|ru|ua|ko|ja|zh-tw)\//, '/');
+  // Jeśli docelowy to domyślny (pl), zwraca czystą ścieżkę, inaczej dodaje prefiks
+  return locale === 'pl' ? cleanPath : `/${locale}${cleanPath.startsWith('/') ? cleanPath : '/' + cleanPath}`;
+};
+
+// Mapowanie nazw języków dla lepszej dostępności
+const langNames = {
+  pl: 'Polski', en: 'English', et: 'Eesti', de: 'Deutsch', 
+  he: 'עברית', ru: 'Русский', ua: 'Українська', 
+  ko: '한국어', ja: '日本語', 'zh-tw': '繁體中文'
+};
+---
+
+<header class="header" role="banner">
+  <nav class="nav-container" aria-label="Główna nawigacja">
+    <!-- LOGO SEKCIJA - Dynamicznie prowadzi do Home danego języka -->
+    <div class="logo-wrapper">
+      <a href={getLocalizedPath(currentLang)} class="logo-link" aria-label="ALNAIR Home">
+        <img src="/logo.svg" alt="" class="logo-img" aria-hidden="true" />
+        <span class="brand-text">ALNAIR</span>
+      </a>
+    </div>
+
+    <!-- MENU DESKTOP -->
+    <div class="nav-links desktop-only">
+      <HeaderLink href={getLocalizedPath(currentLang)}>Home</HeaderLink>
+      <HeaderLink href={getLocalizedPath(currentLang).replace(/\/$/, '') + "/about"}>O nas</HeaderLink>
+      
+      <div class="lang-dropdown">
+        <button 
+          class="lang-btn" 
+          aria-haspopup="true" 
+          aria-expanded="false"
+          aria-label="Zmień język / Change language"
+        >
+          {currentLang.toUpperCase()} ▼
+        </button>
+        <div class="dropdown-content shadow-2xl" role="menu">
+          {locales.map((loc) => (
+            <a 
+              href={getLocalizedPath(loc)} 
+              role="menuitem"
+              class={loc === 'he' ? 'rtl-text' : ''}
+            >
+              <span class="lang-code">{loc.toUpperCase()}</span> — {langNames[loc]}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBILE MENU BUTTON -->
+    <button id="menu-toggle" class="mobile-only" aria-label="Otwórz menu">
+      MENU
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU OVERLAY -->
+  <div id="mobile-menu" class="mobile-menu hidden" role="dialog" aria-modal="true">
+    <div class="mobile-nav-links">
+      <a href={getLocalizedPath(currentLang)}>Home</a>
+      <a href={getLocalizedPath(currentLang).replace(/\/$/, '') + "/about"}>O nas</a>
+    </div>
+    <hr class="border-slate-800 mx-6" />
+    <p class="lang-label">Wybierz język:</p>
+    <div class="mobile-langs">
+      {locales.map((loc) => (
+        <a href={getLocalizedPath(loc)} class="mobile-lang-item">
+          {loc.toUpperCase()}
+        </a>
+      ))}
+    </div>
+  </div>
+</header>
+
+<style>
+  :root {
+    --nav-bg: #020617; /* Bardzo ciemny granat (Security/Defence) */
+    --nav-text: #f8fafc;
+    --accent: #3b82f6; /* Niebieski ALNAIR */
+  }
+  .header {
+    background: var(--nav-bg);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #1e293b;
+  }
+  .nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+  }
+  
+  /* LOGO */
+  .logo-link { display: flex; align-items: center; gap: 1rem; text-decoration: none; }
+  .logo-img {
+    height: 60px; /* Rozmiar docelowy */
+    width: auto;
+    filter: brightness(0) invert(1); /* Logo na biało */
+  }
+  .brand-text {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  /* DESKTOP NAV */
+  .nav-links { display: flex; align-items: center; gap: 2.5rem; }
+  .lang-btn {
+    background: #1e293b;
+    color: white;
+    border: 2px solid #334155;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+  }
+  .lang-btn:hover, .lang-btn:focus { border-color: var(--accent); background: #0f172a; }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: #0f172a;
+    min-width: 240px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .dropdown-content a {
+    color: white;
+    padding: 14px 20px;
+    text-decoration: none;
+    display: block;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #1e293b;
+  }
+  .dropdown-content a:hover { background: #1e293b; color: var(--accent); }
+  .lang-dropdown:hover .dropdown-content, 
+  .lang-dropdown:focus-within .dropdown-content { display: block; }
+
+  .lang-code { color: var(--accent); font-weight: 900; }
+  .rtl-text { direction: rtl; text-align: right; }
+
+  /* MOBILE */
+  .mobile-only {
+    display: none;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .mobile-menu { background: var(--nav-bg); border-bottom: 4px solid var(--accent); }
+  .mobile-nav-links { padding: 1.5rem 2rem; }
+  .mobile-nav-links a { display: block; color: white; font-size: 1.4rem; font-weight: 800; padding: 1rem 0; text-decoration: none; }
+  .lang-label { color: var(--accent); font-weight: 900; font-size: 0.75rem; text-transform: uppercase; padding: 1.5rem 2rem 0.5rem; letter-spacing: 0.1em; }
+  .mobile-langs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 1rem 2rem 2rem; }
+  .mobile-lang-item { background: #1e293b; color: white; text-align: center; padding: 12px 5px; font-size: 0.75rem; font-weight: bold; border-radius: 4px; text-decoration: none; }
+  .hidden { display: none; }
+
+  @media (max-width: 950px) {
+    .desktop-only { display: none; }
+    .mobile-only { display: block; }
+    .brand-text { font-size: 1.3rem; }
+    .logo-img { height: 45px; }
+  }
+</style>
+
+<script>
+  function initHeader() {
+    const btn = document.getElementById('menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    btn?.addEventListener('click', () => {
+      const isHidden = menu?.classList.toggle('hidden');
+      btn.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+    });
+  }
+  // Obsługa View Transitions i pierwszego ładowania
+  initHeader();
+  document.addEventListener('astro:after-swap', initHeader);
+</script>

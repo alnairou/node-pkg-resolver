@@ -1,0 +1,43 @@
+---
+const { lang = "pl" } = Astro.props;
+
+const labels = {
+  pl: { msg: "Używamy plików cookie dla zapewnienia bezpieczeństwa i analizy strategicznej.", btn: "Akceptuję" },
+  en: { msg: "We use cookies for security and strategic analysis.", btn: "Accept" },
+  et: { msg: "Kasutame küpsiseid turvalisuse ja strateegilise analüüsi eesmärgil.", btn: "Nõustun" },
+  de: { msg: "Wir verwenden Cookies für Sicherheit und strategische Analyse.", btn: "Akzeptieren" },
+  he: { msg: "אנו משתמשים בעוגיות לצורך אבטחה וניתוח אסטרטגי.", btn: "אשר" },
+  ru: { msg: "Мы используем файлы cookie для обеспечения безопасности и стратегического анализа.", btn: "Принимаю" },
+  ua: { msg: "Ми використовуємо файли cookie для безпеки та стратегічного аналізу.", btn: "Приймаю" },
+  ko: { msg: "보안 및 전략적 분석을 위해 쿠키를 사용합니다.", btn: "수락" },
+  ja: { msg: "セキュリティおよび戦略的分析のためにクッキーを使用しています。", btn: "同意する" },
+  "zh-tw": { msg: "我們使用 Cookie 以確保安全並進行戰略分析。", btn: "接受" }
+};
+
+const current = labels[lang] || labels.en;
+const isRTL = lang === 'he';
+---
+
+<div id="cookie-banner" role="region" aria-live="polite" dir={isRTL ? 'rtl' : 'ltr'}
+  class="fixed bottom-0 left-0 w-full bg-slate-950/98 text-white p-6 z-[9999] hidden border-t-2 border-blue-600 backdrop-blur-md shadow-2xl">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 font-sans">
+    <p class="text-base md:text-lg font-medium leading-relaxed">{current.msg}</p>
+    <button id="accept-cookies" class="bg-blue-600 hover:bg-blue-500 focus:ring-4 focus:ring-white focus:outline-none text-white px-10 py-3 rounded-md font-bold uppercase transition-all active:scale-95 whitespace-nowrap shadow-lg">
+      {current.btn}
+    </button>
+  </div>
+</div>
+
+<script>
+  const initBanner = () => {
+    const banner = document.getElementById('cookie-banner');
+    const btn = document.getElementById('accept-cookies');
+    if (!localStorage.getItem('cookies-accepted')) banner?.classList.remove('hidden');
+    btn?.addEventListener('click', () => {
+      localStorage.setItem('cookies-accepted', 'true');
+      banner?.classList.add('hidden');
+    });
+  };
+  initBanner();
+  document.addEventListener('astro:after-swap', initBanner);
+</script>

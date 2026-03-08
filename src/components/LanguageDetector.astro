@@ -1,0 +1,69 @@
+---
+import { ui } from '../i18n/ui';
+const currentLang = Astro.currentLocale || 'pl';
+
+// Mapowanie kodów ISO na nazwy i ścieżki
+const suggestionLabels: Record<string, string> = {
+  pl: "Czy wolisz przeglądać stronę po polsku?",
+  en: "Would you prefer to view this site in English?",
+  ko: "이 사이트를 한국어로 보고 싶으신가요?",
+  he: "האם תفضل לצפות באתר זה בעברית?",
+  ja: "このサイトを日本語で表示しますか？",
+  et: "Kas eelistate vaadata seda saiti eesti keeles?",
+  de: "Möchten Sie diese Seite auf Deutsch sehen?",
+  ru: "Хотите просмотреть этот сайт на русском языке?",
+  ua: "Бажаєте переглянути цей сайт українською мовою?",
+  "zh-tw": "您想以繁體中文瀏覽此網站嗎？"
+};
+---
+
+<div id="lang-suggestion" class="hidden fixed top-20 left-0 w-full z-[1001] px-4 animate-in fade-in slide-in-from-top-4">
+  <div class="max-w-3xl mx-auto bg-blue-600 text-white p-4 rounded-lg shadow-2xl flex items-center justify-between gap-4 border border-blue-400 backdrop-blur-md">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl" id="suggested-flag">🌐</span>
+      <p id="suggestion-text" class="text-sm font-bold tracking-wide"></p>
+    </div>
+    <div class="flex gap-2">
+      <a id="confirm-lang" href="#" class="bg-white text-blue-600 px-4 py-1.5 rounded font-black text-xs uppercase hover:bg-blue-50 transition-all">
+        Tak / Yes
+      </a>
+      <button id="dismiss-lang" class="text-white/80 hover:text-white p-1">
+        <svg xmlns="http://www.w3.org" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ currentLang, suggestionLabels }}>
+  function checkLanguage() {
+    if (localStorage.getItem('lang-suggest-dismissed')) return;
+
+    const browserLang = navigator.language.split('-')[0]; // np. 'ko'
+    const supportedLocales = ['pl', 'en', 'et', 'de', 'he', 'ru', 'ua', 'ko', 'ja', 'zh-tw'];
+
+    if (supportedLocales.includes(browserLang) && browserLang !== currentLang) {
+      const banner = document.getElementById('lang-suggestion');
+      const textEl = document.getElementById('suggestion-text');
+      const linkEl = document.getElementById('confirm-lang');
+      const dismissBtn = document.getElementById('dismiss-lang');
+
+      if (banner && textEl && linkEl) {
+        textEl.innerText = suggestionLabels[browserLang] || suggestionLabels['en'];
+        linkEl.href = browserLang === 'pl' ? '/' : `/${browserLang}/`;
+        banner.classList.remove('hidden');
+
+        dismissBtn?.addEventListener('click', () => {
+          banner.classList.add('hidden');
+          localStorage.setItem('lang-suggest-dismissed', 'true');
+        });
+
+        linkEl.addEventListener('click', () => {
+          localStorage.setItem('lang-suggest-dismissed', 'true');
+        });
+      }
+    }
+  }
+
+  checkLanguage();
+  document.addEventListener('astro:after-swap', checkLanguage);
+</script>

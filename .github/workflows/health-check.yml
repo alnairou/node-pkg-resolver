@@ -13,25 +13,25 @@ jobs:
     steps:
       - name: Extract and Verify URLs from Sitemap
         run: |
-          # Pełna ścieżka do pliku XML wygenerowanego przez Astro na FreeBSD
-          SITEMAP_URL="https://www.alnair.eu"
+          # ADRES MUSI WSKAZYWAĆ NA PLIK XML
+          SITEMAP_URL="https://www.alnair.eui/sitemap-0.xml"
           echo "🤖 Robot ALNAIR OU uruchamia skanowanie sitemapy: $SITEMAP_URL"
 
           # Pobranie sitemapy z obsługą przekierowań (-L) i ignorowaniem błędów certyfikatu (-k)
-          # Wyciągamy wszystkie linki zaczynające się od https://, które są w tagach <loc>
+          # Wyciągamy URL-e z tagów <loc>
           URLS=$(curl -sL -k "$SITEMAP_URL" | grep -oP '(?<=<loc>).*?(?=</loc>)')
 
           if [ -z "$URLS" ]; then
-            echo "❌ BŁĄD: Nie znaleziono linków XML. Sprawdź dostępność pliku pod $SITEMAP_URL"
-            # Debug: Pokaż nagłówki odpowiedzi serwera
-            curl -IsL -k "$SITEMAP_URL"
+            echo "❌ BŁĄD: Nie znaleziono linków XML pod $SITEMAP_URL"
+            echo "--- DEBUG: OTO CO WIDZI ROBOT POD TYM ADRESEM ---"
+            curl -sL -k "$SITEMAP_URL" | head -n 20
             exit 1
           fi
 
           FAILED=0
           for url in $URLS; do
             echo -n "Checking $url... "
-            # Sprawdzenie statusu HTTP z podążaniem za przekierowaniami
+            # Sprawdzenie statusu HTTP (max 10 sekund, podąża za przekierowaniami)
             STATUS=$(curl -o /dev/null -sL -k -w "%{http_code}" --max-time 10 "$url")
 
             if [ "$STATUS" -eq 200 ]; then

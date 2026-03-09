@@ -14,7 +14,7 @@ jobs:
       - name: Extract and Verify URLs from Sitemap
         run: |
           # Wskazujemy na fizyczny plik XML wygenerowany przez Astro na FreeBSD
-          SITEMAP_URL="https://www.alnair.eu"
+          SITEMAP_URL="https://www.alnair.eu/sitemap-0.xml"
           echo "🤖 Robot ALNAIR OU uruchamia skanowanie sitemapy: $SITEMAP_URL"
 
           # Pobranie sitemapy z obsługą przekierowań (-L) i wyciągnięcie linków <loc>

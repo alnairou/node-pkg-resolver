@@ -14,7 +14,7 @@ jobs:
       - name: Extract and Verify URLs from Sitemap
         run: |
           # ADRES MUSI WSKAZYWAĆ NA PLIK XML
-          SITEMAP_URL="https://www.alnair.eui/sitemap-0.xml"
+          SITEMAP_URL="https://www.alnair.eu/sitemap-0.xml"
           echo "🤖 Robot ALNAIR OU uruchamia skanowanie sitemapy: $SITEMAP_URL"
 
           # Pobranie sitemapy z obsługą przekierowań (-L) i ignorowaniem błędów certyfikatu (-k)
